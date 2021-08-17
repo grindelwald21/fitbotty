@@ -1,0 +1,28 @@
+{"intents": [
+        {"tag": "greeting",
+         "patterns": ["Hi", "Hello", "Whats up","hey","good morning","good afternoon","big botty"],
+         "responses": ["Hellooooooooo ! how can i help you today, what exercice you want to fix or analyse ?", "Hi there, how can I help? what exercice you want to fix and analyse ?"],
+         "context_set": ""
+        },
+        {"tag": "bench press",
+         "patterns": ["bench press", "incline press","incline bench press", "benching", "incline benching", "barbell bench press", "barbell incline", "barbell incline bench press"],
+         "responses": ["Alright, send me a video with minimum 2 repetitions where you are doing the exercice, please make sure the angle of shooting is very clear"],
+         "context_set": ""
+        },
+        {"tag": "curls",
+         "patterns": ["i want to fix my curls", "analyse bicep curls", "barbell picep curls", "dumbell bicep curls"],
+         "responses": ["Alright, send me a video with minimum 2 repetitions where you are doing the exercice, please make sure the angle of shooting is very clear"],
+         "context_set": ""
+        },
+        {"tag": "name",
+         "patterns": ["what is your name", "what should I call you", "whats your name?"],
+         "responses": ["You can call me Fit Botty ;).", "I'm Fit Botty!"],
+         "context_set": ""
+        },
+        {"tag": "shoulder press",
+                "patterns": ["how is my shoulder press", "is my shoulder press good", "shoulder press", "barbell shoulder press"],
+                "responses": ["Alright, send me a video with minimum 2 repetitions where you are doing the exercice, please make sure the angle of shooting is very clear"],
+                "context_set": ""
+        }
+        ]
+}
