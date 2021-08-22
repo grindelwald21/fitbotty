@@ -149,6 +149,8 @@ def upload_video(inp):
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
         cap = cv2.VideoCapture("static/uploads/"+filename)
+        returned_cap = cv2.VideoWriter('output.mp4',cv2.VideoWriter_fourcc(*'FMP4'), 20.0, (1280,720))
+
         results = model.predict([bag_of_words(inp, words)])        
         results_index = np.argmax(results)
         tag = labels[results_index]
@@ -180,8 +182,10 @@ def upload_video(inp):
                         list_angles_1.append(hand_grip_angle)
                         list_angles_2.append(elbow_angle)
 
+                    returned_cap.write(img)
                     cv2.imshow("image", img)
                     cv2.waitKey(1)
+                returned_cap.release()
                 plt.plot(time_angles, list_angles_1)
 
                 angle1 = min(list_angles_1)
@@ -246,11 +250,12 @@ def upload_video(inp):
                         list_angles_1.append(left_upper_arm_angle)
                         list_angles_2.append(right_upper_arm_angle)
                     
+                    returned_cap.write(img)
                     cv2.imshow("image", img)
                     cv2.waitKey(1)
                     
                     
-
+                returned_cap.release()
                 plt.plot(time_angles, list_angles_1)
 
                 angle1 = max(list_angles_1)
@@ -305,9 +310,10 @@ def upload_video(inp):
                         list_angles_1.append(left_upper_arm_angle)
                         list_angles_2.append(right_upper_arm_angle)
                     
+                    returned_cap.write(img)
                     cv2.imshow("image", img)
                     cv2.waitKey(1)
-                    
+                returned_cap.release()    
                 plt.plot(time_angles, list_angles_1)
 
                 angle1 = min(list_angles_1)
