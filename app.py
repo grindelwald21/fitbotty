@@ -104,11 +104,11 @@ def after_request(response):
     header['Access-Control-Allow-Methods'] = 'OPTIONS, HEAD, GET, POST, DELETE, PUT'
     return response
 
-@app.route("/chat", methods=['GET'])
+@app.route("/workoutBot", methods=['GET'])
 def beginChat():
-    return jsonify({"response": "Start talking with the bot , type quit to stop the chatbot"})
+    return jsonify({"responses": "Start talking with the bot , type quit to stop the chatbot"})
 
-@app.route("/chat/problem/<string:inp>", methods=['GET'])
+@app.route("/workoutBot/problem/<string:inp>", methods=['GET'])
 def askProblem(inp):
     while True:
         if inp.lower() == "quit":
@@ -120,30 +120,30 @@ def askProblem(inp):
         for tg in data["intents"]:
             if tg['tag'] == tag and tag == "bench press":
                 responses = tg['responses']
-                return jsonify({"response": random.choice(responses)})
+                return jsonify({"responses": random.choice(responses)})
                 break
             elif tg['tag'] == tag and tag == "curls":
                 responses = tg['responses']
-                return jsonify({"response": random.choice(responses)})
+                return jsonify({"responses": random.choice(responses)})
                 break
             elif tg['tag'] == tag and tag == "shoulder press":
                 responses = tg['responses']
-                return jsonify({"response": random.choice(responses)})
+                return jsonify({"responses": random.choice(responses)})
                 break; 
             elif tg['tag'] == tag:
                 responses = tg['responses']
-                return jsonify({"response": random.choice(responses)})
+                return jsonify({"responses": random.choice(responses)})
 remarques= []
 advices= []
 
-@app.route('/upload/<string:inp>', methods=['POST'])
+@app.route('/workoutBot/upload/<string:inp>', methods=['POST'])
 def upload_video(inp):
     
     if 'file' not in request.files:
-        return jsonify({"response": "No file part"})       
+        return jsonify({"responses": "No file part"})       
     file = request.files['file']
     if file.filename == '':
-        return jsonify({"response": "No image selected for uploading"})
+        return jsonify({"responses": "No image selected for uploading"})
     else:
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
