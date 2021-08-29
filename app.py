@@ -13,16 +13,51 @@ import PoseModule as pm
 import numpy as np
 import matplotlib.pyplot as plt
 
+import io
 import os
 import urllib.request
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, send_file
+from flask_mysqldb import MySQL
+
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = 'static/uploads/'
+OUTPUT_FOLDER = 'static/outputs/'
 
 app = Flask(__name__)
 
+#Data Base connection
+
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'medicalappdb'
+
+mysql = MySQL(app)
+
+ 
+#Executing SQL Statements
+@app.route('/')
+def form():
+    #Creating a connection cursor
+    cursor = mysql.connection.cursor()
+    cursor.execute(''' CREATE TABLE fitbotty(id INTEGER, title varchar(255), video longblob) ''')
+    return 'Done!'
+
+def convertToBinaryData(filename):
+    # Convert digital data to binary format
+    with open(filename, 'rb') as file:
+        binaryData = file.read()
+    return binaryData
+
+def write_file(data, filename):
+    # Convert binary data to proper format and write it on Hard Disk
+    with open(filename, 'wb') as file:
+        file.write(data)
+        
+#Files
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 with open("intents.json") as file:
@@ -135,6 +170,7 @@ def askProblem(inp):
                 return jsonify({"responses": random.choice(responses)})
 remarques= []
 advices= []
+imageV = []
 
 @app.route('/workoutBot/upload/<string:inp>', methods=['POST'])
 def upload_video(inp):
@@ -146,11 +182,33 @@ def upload_video(inp):
         return jsonify({"responses": "No image selected for uploading"})
     else:
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        #file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
         cap = cv2.VideoCapture("static/uploads/"+filename)
         returned_cap = cv2.VideoWriter('output.mp4',cv2.VideoWriter_fourcc(*'FMP4'), 20.0, (1280,720))
+        returned_cap = cv2.VideoWriter('static/ouputs/output.mp4',cv2.VideoWriter_fourcc(*'FMP4'), 20.0, (1280,720))
+        ####
+        #uploaded_file.save(os.path.join(app.config['OUTPUT_FOLDER'], 'output.mp4'))
+       
+        cursor = mysql.connection.cursor()
 
+        sql_insert_blob_query = """ INSERT INTO fitbotty
+                          (id, title, video) VALUES (%s,%s,%s)"""
+        #empPicture = convertToBinaryData(file.read())
+        insert_blob_tuple = ('', 'aaa', file.read())
+        result = cursor.execute(sql_insert_blob_query, insert_blob_tuple)
+        id = cursor.lastrowid
+        mysql.connection.commit()
+
+        #sql_fetch_blob_query = """SELECT * from fitbotty where id = %s"""
+        #cursor.execute(sql_fetch_blob_query, (id,))
+        #record = cursor.fetchall()
+        #for row in record:
+         #   imageV.append(row[2].decode('utf-8'))
+          #  imageV
+
+        cursor.close()
+        ####
         results = model.predict([bag_of_words(inp, words)])        
         results_index = np.argmax(results)
         tag = labels[results_index]
@@ -164,7 +222,7 @@ def upload_video(inp):
                 time_angles = []
                 i = 0
                 start_time = time.time()
-                seconds = 7
+                seconds = 14
                 while True:
                     current_time = time.time()
                     elapsed_time = current_time - start_time
@@ -333,8 +391,7 @@ def upload_video(inp):
                 advices.append("Hold the dumbbells by your shoulders with your palms facing forwards and your elbows out to the sides and bent at a 90° angle")
                 advices.append("Without leaning back, extend through your elbows to press the weights above your head. Then slowly return to the starting position.")
                 break;         
-        return jsonify({"remarques": remarques, "advices": advices})
-       
-
+        return jsonify({"remarques": remarques, "advices": advices, "id": id })
+        
 if __name__ == '__main__':
     app.run()
